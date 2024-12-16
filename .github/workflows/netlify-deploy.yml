@@ -1,7 +1,7 @@
 name: Deploy to Netlify
 
 on:
-  workflow_dispatch:  # This allows manual triggering of the workflow
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   deploy:
@@ -12,21 +12,24 @@ jobs:
       uses: actions/checkout@v2  # Checks out the repository code
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3  # Update to use v3 for Node.js v20 support
       with:
-        node-version: '20'  # Specify the Node.js version (change this if necessary)
+        node-version: '20'  # Use Node.js v20
 
-    - name: Install dependencies
-      run: pnpm install  # Runs npm install to install your project dependencies
+    - name: Install pnpm
+      run: npm install -g pnpm  # Install pnpm globally
 
-    - name: Install Netlify CLI
-      run: pnpm install -g netlify-cli  # Installs the Netlify CLI
+    - name: Install dependencies with pnpm
+      run: pnpm install  # Use pnpm to install dependencies
+
+    - name: Install Netlify CLI locally
+      run: pnpm add netlify-cli  # Install Netlify CLI as a local dependency
 
     - name: Build the app
       run: pnpm run build  # Replace this with your specific build command if necessary
 
     - name: Deploy to Netlify
-      run: netlify deploy --prod --dir=./build  # Specify the correct directory for build output
+      run: npx netlify deploy --prod --dir=./build  # Use npx to run locally installed Netlify CLI
       env:
-        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}  # Uses the token for authentication
-        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}  # Optionally use a secret for the site ID
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
