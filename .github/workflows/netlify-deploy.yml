@@ -14,16 +14,16 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Specify the Node.js version (change this if necessary)
+        node-version: '20'  # Specify the Node.js version (change this if necessary)
 
     - name: Install dependencies
-      run: npm install  # Runs npm install to install your project dependencies
+      run: pnpm install  # Runs npm install to install your project dependencies
 
     - name: Install Netlify CLI
-      run: npm install -g netlify-cli  # Installs the Netlify CLI
+      run: pnpm install -g netlify-cli  # Installs the Netlify CLI
 
     - name: Build the app
-      run: npm run build  # Replace this with your specific build command if necessary
+      run: pnpm run build  # Replace this with your specific build command if necessary
 
     - name: Deploy to Netlify
       run: netlify deploy --prod --dir=./build  # Specify the correct directory for build output
