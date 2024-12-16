@@ -29,7 +29,7 @@ jobs:
       run: pnpm run build  # Replace this with your specific build command if necessary
 
     - name: Deploy to Netlify
-      run: npx netlify deploy --prod --dir=./build  # Use npx to run locally installed Netlify CLI
+      run: npx netlify deploy --prod --dir=./dist  # Use npx to run locally installed Netlify CLI
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
