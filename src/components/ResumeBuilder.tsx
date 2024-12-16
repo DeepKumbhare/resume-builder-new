@@ -54,15 +54,7 @@ export function ResumeBuilder() {
         <div className="col-span-1 md:col-span-8 lg:col-span-9">
           <div className="space-y-6">
             {/* Preview Button - Desktop */}
-            <div className="hidden md:block">
-              <button
-                onClick={() => setIsPreviewOpen(true)}
-                className="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
-              >
-                <Eye className="w-5 h-5 mr-2" />
-                Preview Resume
-              </button>
-            </div>
+            
 
             <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
               {activeSection === 'settings' ? (
