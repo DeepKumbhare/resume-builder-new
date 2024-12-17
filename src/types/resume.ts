@@ -41,6 +41,7 @@ export type ContactInfo = {
   linkedin?: string;
   github?: string;
   website?: string;
+  customFields?: { [key: string]: string };
 };
 
 export type Experience = {

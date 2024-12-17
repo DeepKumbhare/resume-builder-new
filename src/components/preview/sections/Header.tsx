@@ -1,6 +1,6 @@
 import React from 'react';
 import { useResumeStore } from '../../../store/useResumeStore';
-import { Mail, MapPin, Phone, Github, Linkedin } from 'lucide-react';
+import { Mail, MapPin, Phone, Github, Linkedin, Globe, Link2, FileText } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 interface HeaderProps {
@@ -116,6 +116,30 @@ export function Header({ isInverted = false }: HeaderProps) {
             GitHub
           </ContactItem>
         )}
+
+        {contact.website && (
+          <ContactItem 
+            icon={Globe}
+            href={contact.website}
+          >
+            Portfolio
+          </ContactItem>
+        )}
+
+        {/* Custom Fields */}
+        {contact.customFields && Object.entries(contact.customFields).map(([name, value]) => {
+          // Check if the value is a URL
+          const isUrl = value.startsWith('http://') || value.startsWith('https://');
+          return (
+            <ContactItem
+              key={name}
+              icon={isUrl ? Link2 : FileText}
+              href={isUrl ? value : undefined}
+            >
+              {name}
+            </ContactItem>
+          );
+        })}
       </div>
     </header>
   );

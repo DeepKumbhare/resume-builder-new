@@ -43,7 +43,22 @@ export function SectionManager({ onPreviewClick }: SectionManagerProps) {
     }
 
     if (Array.isArray(section.content)) {
-      return section.content.length > 0 ? 100 : 0;
+      if (section.content.length === 0) return 0;
+      
+      // Calculate progress based on filled fields in array items
+      const totalFields = section.content.reduce((total: number, item: any) => {
+        return total + Object.keys(item).length;
+      }, 0);
+
+      const filledFields = section.content.reduce((filled: number, item: any) => {
+        return filled + Object.values(item).filter(value => {
+          if (typeof value === 'string') return value.trim().length > 0;
+          if (Array.isArray(value)) return value.length > 0;
+          return value !== null && value !== undefined;
+        }).length;
+      }, 0);
+
+      return totalFields > 0 ? (filledFields / totalFields) * 100 : 0;
     }
 
     if (typeof section.content === 'object') {
@@ -53,6 +68,12 @@ export function SectionManager({ onPreviewClick }: SectionManagerProps) {
       const filledFields = fields.filter(value => {
         if (typeof value === 'string') return value.trim().length > 0;
         if (Array.isArray(value)) return value.length > 0;
+        if (typeof value === 'object' && value !== null) {
+          // For nested objects (like customFields)
+          return Object.values(value).some(v => 
+            typeof v === 'string' ? v.trim().length > 0 : v !== null && v !== undefined
+          );
+        }
         return value !== null && value !== undefined;
       });
 
