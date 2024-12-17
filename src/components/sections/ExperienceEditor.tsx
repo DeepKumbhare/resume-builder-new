@@ -1,55 +1,159 @@
 import React from 'react';
-import { useResumeStore } from '../../store/useResumeStore';
+import { Plus } from 'lucide-react';
 import { Experience } from '../../types/resume';
-import { Briefcase, Calendar, MapPin, Plus, Trash2 } from 'lucide-react';
-import { ExperienceEntry } from './experience/ExperienceEntry';
+import { RichTextEditor } from '../editor/RichTextEditor';
+import { useResumeStore } from '../../store/useResumeStore';
 
 export function ExperienceEditor() {
   const { resumeData, setSection } = useResumeStore();
-  const experiences = resumeData.sections.experience.content as Experience[];
+  const experiences = (resumeData.sections.experience?.content || []) as Experience[];
+
+  const updateExperiences = (updatedExperiences: Experience[]) => {
+    setSection('experience', updatedExperiences);
+  };
 
   const addExperience = () => {
     const newExperience: Experience = {
-      id: crypto.randomUUID(),
       title: '',
       company: '',
       location: '',
       startDate: '',
       endDate: '',
       current: false,
-      responsibilities: [''],
+      responsibilities: ''
     };
-    setSection('experience', [...experiences, newExperience]);
+    updateExperiences([...experiences, newExperience]);
   };
 
-  const updateExperience = (index: number, updatedExperience: Experience) => {
-    const updatedExperiences = [...experiences];
-    updatedExperiences[index] = updatedExperience;
-    setSection('experience', updatedExperiences);
+  const updateExperience = (index: number, updated: Experience) => {
+    const newExperiences = [...experiences];
+    newExperiences[index] = updated;
+    updateExperiences(newExperiences);
   };
 
   const removeExperience = (index: number) => {
-    const updatedExperiences = experiences.filter((_, i) => i !== index);
-    setSection('experience', updatedExperiences);
+    updateExperiences(experiences.filter((_, i) => i !== index));
+  };
+
+  const handleCurrentChange = (index: number, checked: boolean) => {
+    const currentDate = new Date().toISOString().slice(0, 7); // Format: YYYY-MM
+    const updated = { ...experiences[index] };
+    updated.current = checked;
+    if (checked) {
+      updated.endDate = currentDate;
+    }
+    updateExperience(index, updated);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {experiences.map((experience, index) => (
-        <ExperienceEntry
-          key={experience.id}
-          experience={experience}
-          onChange={(updated) => updateExperience(index, updated)}
-          onRemove={() => removeExperience(index)}
-        />
-      ))}
+        <div key={index} className="space-y-4 p-4 border border-gray-200 rounded-lg">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Job Title
+              </label>
+              <input
+                type="text"
+                value={experience.title}
+                onChange={(e) => updateExperience(index, { ...experience, title: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Software Engineer"
+              />
+            </div>
 
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Company Name
+              </label>
+              <input
+                type="text"
+                value={experience.company}
+                onChange={(e) => updateExperience(index, { ...experience, company: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Company Inc."
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Start Date
+              </label>
+              <input
+                type="month"
+                value={experience.startDate}
+                onChange={(e) => updateExperience(index, { ...experience, startDate: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                End Date
+              </label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="month"
+                  value={experience.endDate}
+                  onChange={(e) => updateExperience(index, { ...experience, endDate: e.target.value })}
+                  disabled={experience.current}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100"
+                />
+                <label className="flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={experience.current}
+                    onChange={(e) => handleCurrentChange(index, e.target.checked)}
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span>Current</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Location
+            </label>
+            <input
+              type="text"
+              value={experience.location}
+              onChange={(e) => updateExperience(index, { ...experience, location: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="City, Country"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Key Responsibilities
+            </label>
+            <RichTextEditor
+              content={experience.responsibilities}
+              onChange={(value) => updateExperience(index, { ...experience, responsibilities: value })}
+              placeholder="Describe your key responsibilities and achievements..."
+            />
+          </div>
+
+          <button
+            onClick={() => removeExperience(index)}
+            className="text-red-600 hover:text-red-700 text-sm"
+          >
+            Remove Experience
+          </button>
+        </div>
+      ))}
+      
       <button
         onClick={addExperience}
-        className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        className="flex items-center space-x-2 text-sm text-indigo-600 hover:text-indigo-700"
       >
-        <Plus className="h-4 w-4 mr-2" />
-        Add Experience
+        <Plus className="w-4 h-4" />
+        <span>Add Experience</span>
       </button>
     </div>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Experience } from '../../../types/resume';
 import { Briefcase, Calendar, MapPin, Plus, Trash2 } from 'lucide-react';
-import { ResponsibilitiesList } from './ResponsibilitiesList';
+import { RichTextEditor } from '../../editor/RichTextEditor';
 
 type ExperienceEntryProps = {
   experience: Experience;
@@ -12,6 +12,14 @@ type ExperienceEntryProps = {
 export function ExperienceEntry({ experience, onChange, onRemove }: ExperienceEntryProps) {
   const handleChange = (field: keyof Experience, value: any) => {
     onChange({ ...experience, [field]: value });
+  };
+
+  const handleCurrentChange = (checked: boolean) => {
+    const currentDate = new Date().toISOString().slice(0, 7); // Format: YYYY-MM
+    handleChange('current', checked);
+    if (checked) {
+      handleChange('endDate', currentDate);
+    }
   };
 
   return (
@@ -77,12 +85,7 @@ export function ExperienceEntry({ experience, onChange, onRemove }: ExperienceEn
                   <input
                     type="checkbox"
                     checked={experience.current}
-                    onChange={(e) => {
-                      handleChange('current', e.target.checked);
-                      if (e.target.checked) {
-                        handleChange('endDate', '');
-                      }
-                    }}
+                    onChange={(e) => handleCurrentChange(e.target.checked)}
                     className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span>Current</span>
@@ -101,19 +104,25 @@ export function ExperienceEntry({ experience, onChange, onRemove }: ExperienceEn
               value={experience.location}
               onChange={(e) => handleChange('location', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="City, State"
+              placeholder="City, Country"
             />
           </div>
 
-          <ResponsibilitiesList
-            responsibilities={experience.responsibilities}
-            onChange={(updated) => handleChange('responsibilities', updated)}
-          />
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Key Responsibilities
+            </label>
+            <RichTextEditor
+              content={experience.responsibilities}
+              onChange={(value) => handleChange('responsibilities', value)}
+              placeholder="Describe your key responsibilities and achievements..."
+            />
+          </div>
         </div>
 
         <button
           onClick={onRemove}
-          className="ml-4 p-1 text-gray-400 hover:text-gray-500"
+          className="p-2 text-gray-400 hover:text-gray-500"
           title="Remove experience"
         >
           <Trash2 className="w-5 h-5" />
