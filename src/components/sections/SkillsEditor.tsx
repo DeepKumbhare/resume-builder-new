@@ -1,50 +1,66 @@
 import React from 'react';
+import { Plus } from 'lucide-react';
 import { useResumeStore } from '../../store/useResumeStore';
-import { Skill } from '../../types/resume';
-import { Wrench, Plus, Trash2 } from 'lucide-react';
-import { SkillCategory } from './skills/SkillCategory';
+import { SectionTip } from '../common/SectionTip';
+
+const SKILLS_TIPS = {
+  title: "Tips for Showcasing Skills",
+  tips: [
+    "List both technical and soft skills relevant to the role",
+    "Group similar skills together (e.g., Programming Languages, Tools)",
+    "Include proficiency levels for language skills"
+  ]
+};
 
 export function SkillsEditor() {
   const { resumeData, setSection } = useResumeStore();
-  const skills = resumeData.sections.skills.content as Skill[];
+  const skills = (resumeData.sections.skills?.content || []) as string[];
 
-  const addCategory = () => {
-    const newCategory: Skill = {
-      id: crypto.randomUUID(),
-      category: '',
-      skills: [''],
-    };
-    setSection('skills', [...skills, newCategory]);
+  const addSkill = () => {
+    setSection('skills', [...skills, '']);
   };
 
-  const updateCategory = (index: number, updatedCategory: Skill) => {
-    const updatedCategories = [...skills];
-    updatedCategories[index] = updatedCategory;
-    setSection('skills', updatedCategories);
+  const updateSkill = (index: number, value: string) => {
+    const newSkills = [...skills];
+    newSkills[index] = value;
+    setSection('skills', newSkills);
   };
 
-  const removeCategory = (index: number) => {
-    const updatedCategories = skills.filter((_, i) => i !== index);
-    setSection('skills', updatedCategories);
+  const removeSkill = (index: number) => {
+    setSection('skills', skills.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="space-y-6">
-      {skills.map((category, index) => (
-        <SkillCategory
-          key={category.id}
-          category={category}
-          onChange={(updated) => updateCategory(index, updated)}
-          onRemove={() => removeCategory(index)}
-        />
+    <div className="space-y-4">
+      <SectionTip 
+        title={SKILLS_TIPS.title}
+        tips={SKILLS_TIPS.tips}
+      />
+
+      {skills.map((skill, index) => (
+        <div key={index} className="flex items-center gap-2">
+          <input
+            type="text"
+            value={skill}
+            onChange={(e) => updateSkill(index, e.target.value)}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Enter a skill..."
+          />
+          <button
+            onClick={() => removeSkill(index)}
+            className="text-red-600 hover:text-red-700 text-sm"
+          >
+            Remove
+          </button>
+        </div>
       ))}
 
       <button
-        onClick={addCategory}
-        className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        onClick={addSkill}
+        className="flex items-center space-x-2 text-sm text-indigo-600 hover:text-indigo-700"
       >
-        <Plus className="h-4 w-4 mr-2" />
-        Add Skill Category
+        <Plus className="w-4 h-4" />
+        <span>Add Skill</span>
       </button>
     </div>
   );

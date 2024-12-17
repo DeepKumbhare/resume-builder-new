@@ -1,57 +1,59 @@
 import React from 'react';
-import { useResumeStore } from '../../store/useResumeStore';
+import { Plus } from 'lucide-react';
 import { Language } from '../../types/resume';
-import { Languages as LanguagesIcon, Plus, Trash2 } from 'lucide-react';
+import { useResumeStore } from '../../store/useResumeStore';
+import { SectionTip } from '../common/SectionTip';
+
+const LANGUAGE_TIPS = {
+  title: "Tips for Language Section",
+  tips: [
+    "Specify proficiency level (e.g., Native, Fluent, Intermediate)",
+    "Include certifications if available (e.g., TOEFL, IELTS)",
+    "List languages in order of proficiency"
+  ]
+};
 
 export function LanguagesEditor() {
   const { resumeData, setSection } = useResumeStore();
-  const languages = resumeData.sections.languages.content as Language[];
+  const languages = (resumeData.sections.languages?.content || []) as Language[];
 
   const addLanguage = () => {
     const newLanguage: Language = {
-      id: crypto.randomUUID(),
       name: '',
       proficiency: '',
+      certification: ''
     };
     setSection('languages', [...languages, newLanguage]);
   };
 
-  const updateLanguage = (index: number, field: keyof Language, value: string) => {
-    const updatedLanguages = [...languages];
-    updatedLanguages[index] = { ...updatedLanguages[index], [field]: value };
-    setSection('languages', updatedLanguages);
+  const updateLanguage = (index: number, updated: Language) => {
+    const newLanguages = [...languages];
+    newLanguages[index] = updated;
+    setSection('languages', newLanguages);
   };
 
   const removeLanguage = (index: number) => {
-    const updatedLanguages = languages.filter((_, i) => i !== index);
-    setSection('languages', updatedLanguages);
+    setSection('languages', languages.filter((_, i) => i !== index));
   };
 
-  const proficiencyLevels = [
-    'Native',
-    'Fluent',
-    'Advanced',
-    'Intermediate',
-    'Basic',
-  ];
-
   return (
-    <div className="space-y-6">
-      {languages.map((language, index) => (
-        <div
-          key={language.id}
-          className="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg"
-        >
-          <div className="flex-1 grid grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <SectionTip 
+        title={LANGUAGE_TIPS.title}
+        tips={LANGUAGE_TIPS.tips}
+      />
+
+      {languages.map((lang, index) => (
+        <div key={index} className="space-y-4 p-4 border border-gray-200 rounded-lg">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="flex items-center text-sm font-medium text-gray-700">
-                <LanguagesIcon className="w-4 h-4 mr-2" />
+              <label className="block text-sm font-medium text-gray-700">
                 Language
               </label>
               <input
                 type="text"
-                value={language.name}
-                onChange={(e) => updateLanguage(index, 'name', e.target.value)}
+                value={lang.name}
+                onChange={(e) => updateLanguage(index, { ...lang, name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="English"
               />
@@ -62,36 +64,48 @@ export function LanguagesEditor() {
                 Proficiency Level
               </label>
               <select
-                value={language.proficiency}
-                onChange={(e) => updateLanguage(index, 'proficiency', e.target.value)}
+                value={lang.proficiency}
+                onChange={(e) => updateLanguage(index, { ...lang, proficiency: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="">Select proficiency</option>
-                {proficiencyLevels.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
+                <option value="">Select Level</option>
+                <option value="Native">Native</option>
+                <option value="Fluent">Fluent</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Basic">Basic</option>
               </select>
             </div>
           </div>
 
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Certification (Optional)
+            </label>
+            <input
+              type="text"
+              value={lang.certification}
+              onChange={(e) => updateLanguage(index, { ...lang, certification: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="TOEFL: 110/120"
+            />
+          </div>
+
           <button
             onClick={() => removeLanguage(index)}
-            className="p-1 text-gray-400 hover:text-gray-500"
-            title="Remove language"
+            className="text-red-600 hover:text-red-700 text-sm"
           >
-            <Trash2 className="w-5 h-5" />
+            Remove Language
           </button>
         </div>
       ))}
 
       <button
         onClick={addLanguage}
-        className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        className="flex items-center space-x-2 text-sm text-indigo-600 hover:text-indigo-700"
       >
-        <Plus className="h-4 w-4 mr-2" />
-        Add Language
+        <Plus className="w-4 h-4" />
+        <span>Add Language</span>
       </button>
     </div>
   );

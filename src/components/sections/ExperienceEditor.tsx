@@ -3,6 +3,16 @@ import { Plus } from 'lucide-react';
 import { Experience } from '../../types/resume';
 import { RichTextEditor } from '../editor/RichTextEditor';
 import { useResumeStore } from '../../store/useResumeStore';
+import { SectionTip } from '../common/SectionTip';
+
+const EXPERIENCE_TIPS = {
+  title: "Tips for Writing Strong Work Experience",
+  tips: [
+    "Quantify achievements wherever possible (e.g., \"Reduced processing time by 20%\")",
+    "Use action verbs to start each bullet point (e.g., Led, Developed, Implemented)",
+    "Focus on achievements rather than duties"
+  ]
+};
 
 export function ExperienceEditor() {
   const { resumeData, setSection } = useResumeStore();
@@ -47,6 +57,11 @@ export function ExperienceEditor() {
 
   return (
     <div className="space-y-4">
+      <SectionTip 
+        title={EXPERIENCE_TIPS.title}
+        tips={EXPERIENCE_TIPS.tips}
+      />
+
       {experiences.map((experience, index) => (
         <div key={index} className="space-y-4 p-4 border border-gray-200 rounded-lg">
           <div className="grid grid-cols-2 gap-4">
